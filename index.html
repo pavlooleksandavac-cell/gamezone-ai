@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GameZone</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#20252b}
+header{background:#171b20;color:white;padding:16px;text-align:center;font-size:24px;font-weight:bold}
+nav{display:flex;gap:8px;padding:10px;background:white;overflow:auto;position:sticky;top:0;z-index:5}
+button{border:0;border-radius:10px;padding:11px 14px;background:#1976d2;color:white;font-weight:bold;cursor:pointer}
+button:active{transform:scale(.97)}
+button.gray{background:#e4e8ed;color:#20252b}
+main{max-width:900px;margin:auto;padding:15px}
+.page{display:none}
+.page.active{display:block}
+.card{background:white;border-radius:15px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px #0001}
+h2{margin-top:0}
+input,textarea,select{width:100%;padding:12px;border:1px solid #ccd2d8;border-radius:10px;margin:6px 0 10px;font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.item{background:#f1f4f7;padding:14px;border-radius:12px}
+.coins{font-size:22px;font-weight:bold}
+.chat{height:350px;overflow:auto;background:#f0f2f5;padding:12px;border-radius:12px}
+.msg{padding:10px;margin:7px 0;border-radius:12px;white-space:pre-wrap}
+.me{background:#d8ebff;margin-left:15%}
+.ai{background:#e7e7e7;margin-right:15%}
+.row{display:flex;gap:8px}
+.row input{margin:0;flex:1}
+.status{padding:9px;border-radius:9px;background:#eee;margin-bottom:10px}
+small{color:#667}
+</style>
+</head>
+
+<body>
+
+<header>🎮 GameZone</header>
+
+<nav>
+<button onclick="show('home')">🏠 Головна</button>
+<button onclick="show('profile')">👤 Профіль</button>
+<button onclick="show('shop')">🛒 Магазин</button>
+<button onclick="show('quests')">📜 Квести</button>
+<button onclick="show('chat')">💬 Чат</button>
+<button onclick="show('nn')">🤖 Chat NN</button>
+</nav>
+
+<main>
+
+<section id="home" class="page active">
+<div class="card">
+<h2>🎮 Ласкаво просимо в GameZone</h2>
+<p>Твій ігровий простір.</p>
+<div class="coins">🪙 <span id="homeCoins">1000</span> монет</div>
+</div>
+
+<div class="card">
+<h2>⚡ Швидкі дії</h2>
+<div class="grid">
+<button onclick="show('profile')">👤 Мій профіль</button>
+<button onclick="show('shop')">🛒 Магазин</button>
+<button onclick="show('quests')">📜 Квести</button>
+<button onclick="show('chat')">💬 Чат</button>
+<button onclick="show('nn')">🤖 Chat NN</button>
+</div>
+</div>
+</section>
+
+<section id="profile" class="page">
+<div class="card">
+<h2>👤 Мій профіль</h2>
+<p><b>Нікнейм:</b> <span id="nickname">Гравець</span></p>
+<p><b>Рівень:</b> <span id="level">1</span></p>
+<p><b>🪙 Монети:</b> <span id="coins">1000</span></p>
+<p><b>🏆 Кубки:</b> <span id="trophies">0</span></p>
+<button onclick="addTrophy()">🏆 Додати кубок</button>
+</div>
+
+<div class="card">
+<h2>✏️ Змінити нікнейм</h2>
+<input id="nameInput" placeholder="Новий нікнейм">
+<button onclick="changeName()">Зберегти</button>
+</div>
+</section>
+
+<section id="shop" class="page">
+<div class="card">
+<h2>🛒 Магазин</h2>
+<p>🪙 Баланс: <b id="shopCoins">1000</b></p>
+</div>
+
+<div class="grid">
+<div class="item">
+<h3>⭐ 100 кубків</h3>
+<p>Ціна: 100 монет</p>
+<button onclick="buy(100,100)">Купити</button>
+</div>
+
+<div class="item">
+<h3>⭐ 500 кубків</h3>
+<p>Ціна: 450 монет</p>
+<button onclick="buy(500,450)">Купити</button>
+</div>
+
+<div class="item">
+<h3>🎁 Бонус</h3>
+<p>+50 монет</p>
+<button onclick="bonus()">Отримати</button>
+</div>
+</div>
+</section>
+
+<section id="quests" class="page">
+<div class="card">
+<h2>📜 Квести</h2>
+</div>
+
+<div class="item">
+<h3>🎯 Зробити покупку</h3>
+<p>Зроби одну покупку в магазині.</p>
+<button onclick="quest(1)">Виконати</button>
+</div>
+
+<div class="item">
+<h3>💬 Написати в чат</h3>
+<p>Надішли повідомлення.</p>
+<button onclick="show('chat')">Перейти до чату</button>
+</div>
+</section>
+
+<section id="chat" class="page">
+<div class="card">
+<h2>💬 Громадський чат</h2>
+<div id="publicChat" class="chat"></div>
+<div class="row">
+<input id="chatInput" placeholder="Напиши повідомлення...">
+<button onclick="sendChat()">Надіслати</button>
+</div>
+</div>
+</section>
+
+<section id="nn" class="page">
+<div class="card">
+<h2>🤖 Chat NN — Умний інтелект</h2>
+
+<div id="nnStatus" class="status">
+🔄 Перевіряю AI-сервер...
+</div>
+
+<div id="nnChat" class="chat"></div>
+
+<div class="row">
+<input id="nnInput" placeholder="Запитай щось у Chat NN..." onkeydown="if(event.key==='Enter')sendNN()">
+<button id="nnSend" onclick="sendNN()">Запитати</button>
+</div>
+
+<br>
+<button class="gray" onclick="clearNN()">🗑 Очистити чат</button>
+</div>
+</section>
+
+</main>
+
+<script>
+const KEY='gamezone_data_v1';
+const CHAT='gamezone_public_chat_v1';
+const NN='gamezone_nn_chat_v1';
+
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||{
+ nickname:'Гравець',
+ coins:1000,
+ trophies:0,
+ level:1
+};
+
+function save(){
+ localStorage.setItem(KEY,JSON.stringify(data));
+ update();
+}
+
+function update(){
+ document.getElementById('nickname').textContent=data.nickname;
+ document.getElementById('coins').textContent=data.coins;
+ document.getElementById('shopCoins').textContent=data.coins;
+ document.getElementById('homeCoins').textContent=data.coins;
+ document.getElementById('trophies').textContent=data.trophies;
+ document.getElementById('level').textContent=data.level;
+}
+
+function show(id){
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+ const p=document.getElementById(id);
+ if(p)p.classList.add('active');
+ if(id==='nn')checkNN();
+ if(id==='chat')renderChat();
+}
+
+function changeName(){
+ const v=document.getElementById('nameInput').value.trim();
+ if(!v)return alert('Введи нікнейм');
+ data.nickname=v;
+ document.getElementById('nameInput').value='';
+ save();
+ alert('✅ Нікнейм збережено');
+}
+
+function addTrophy(){
+ data.trophies++;
+ save();
+ alert('🏆 Додано 1 кубок');
+}
+
+function buy(trophies,price){
+ if(data.coins<price){
+  alert('❌ Недостатньо монет');
+  return;
+ }
+ data.coins-=price;
+ data.trophies+=trophies;
+ save();
+ alert('✅ Покупку виконано');
+}
+
+function bonus(){
+ data.coins+=50;
+ save();
+ alert('🎁 Отримано 50 монет');
+}
+
+function quest(n){
+ if(n===1){
+  if(data.coins<1)return alert('Спочатку зроби покупку');
+  data.coins+=25;
+  save();
+  alert('✅ Квест виконано! +25 монет');
+ }
+}
+
+function load(key){
+ try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return[]}
+}
+
+function saveList(key,a){
+ localStorage.setItem(key,JSON.stringify(a));
+}
+
+function renderChat(){
+ const box=document.getElementById('publicChat');
+ if(!box)return;
+ const a=load(CHAT);
+ box.innerHTML=a.map(x=>
+ `<div class="msg ${x.me?'me':'ai'}"><b>${x.me?'Ти':'GameZone'}:</b> ${escapeHTML(x.text)}</div>`
+ ).join('');
+ box.scrollTop=box.scrollHeight;
+}
+
+function sendChat(){
+ const i=document.getElementById('chatInput');
+ const text=i.value.trim();
+ if(!text)return;
+ const a=load(CHAT);
+ a.push({me:true,text});
+ saveList(CHAT,a);
+ i.value='';
+ renderChat();
+}
+
+function renderNN(){
+ const box=document.getElementById('nnChat');
+ const a=load(NN);
+ box.innerHTML=a.map(x=>
+ `<div class="msg ${x.role==='user'?'me':'ai'}"><b>${x.role==='user'?'Ти':'Chat NN'}:</b> ${escapeHTML(x.text)}</div>`
+ ).join('');
+ box.scrollTop=box.scrollHeight;
+}
+
+async function checkNN(){
+ const s=document.getElementById('nnStatus');
+ try{
+  const r=await fetch('/api/health');
+  const d=await r.json();
+  if(r.ok&&d.aiConfigured){
+   s.textContent='🟢 AI-сервер онлайн • '+(d.model||'AI');
+  }else{
+   s.textContent='🔴 AI-сервер працює, але AI ще не налаштований';
+  }
+ }catch(e){
+  s.textContent='🔴 AI-сервер недоступний';
+ }
+ renderNN();
+}
+
+function getNNMessages(){
+ return load(NN)
+ .filter(x=>x.role==='user'||x.role==='ai')
+ .map(x=>({
+  role:x.role==='ai'?'assistant':'user',
+  content:String(x.text||'')
+ }));
+}
+
+async function sendNN(){
+ const input=document.getElementById('nnInput');
+ const btn=document.getElementById('nnSend');
+ const text=input.value.trim();
+ if(!text)return;
+
+ const a=load(NN);
+ a.push({role:'user',text});
+ saveList(NN,a);
+ input.value='';
+ renderNN();
+
+ btn.disabled=true;
+ btn.textContent='⏳ Думаю...';
+
+ try{
+  const response=await fetch('/api/chat',{
+   method:'POST',
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({
+    messages:getNNMessages()
+   })
+  });
+
+  const result=await response.json();
+
+  if(!response.ok){
+   throw new Error(result.error||('HTTP '+response.status));
+  }
+
+  const list=load(NN);
+  list.push({
+   role:'ai',
+   text:result.reply||'Не отримав відповідь від AI.'
+  });
+  saveList(NN,list);
+  renderNN();
+
+ }catch(err){
+  const list=load(NN);
+  list.push({
+   role:'ai',
+   text:'⚠️ Не вдалося отримати відповідь від AI.\n\n'+err.message
+  });
+  saveList(NN,list);
+  renderNN();
+ }finally{
+  btn.disabled=false;
+  btn.textContent='Запитати';
+ }
+}
+
+function clearNN(){
+ localStorage.removeItem(NN);
+ renderNN();
+}
+
+function escapeHTML(s){
+ return String(s)
+ .replaceAll('&','&amp;')
+ .replaceAll('<','&lt;')
+ .replaceAll('>','&gt;')
+ .replaceAll('"','&quot;')
+ .replaceAll("'","&#039;");
+}
+
+update();
+renderChat();
+renderNN();
+</script>
+
+</body>
+</html>
